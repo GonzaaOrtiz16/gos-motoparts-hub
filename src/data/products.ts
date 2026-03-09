@@ -1,20 +1,18 @@
 export interface Product {
   id: string;
-  name: string;
-  title?: string;
-  slug?: string;
+  title: string;
+  slug: string;
   price: number;
   original_price?: number;
-  images?: string[];
-  image_urls?: string[];
-  category?: string;
-  brand?: string;
-  free_shipping?: boolean;
-  description?: string;
-  stock?: number;
+  images: string[];
+  category: string;
+  brand: string;
+  free_shipping: boolean;
+  description: string;
+  stock: number;
   is_on_sale?: boolean;
-  created_at?: string;
   sizes?: string[];
+  created_at?: string;
 }
 
 export const categories = [
