@@ -1,94 +1,67 @@
-import React from "react";
-import { X, Plus, Minus, Trash2, MessageCircle } from "lucide-react";
+import { X, Minus, Plus, ShoppingBag } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
-const WHATSAPP_NUMBER = "5491165483728";
+const formatPrice = (n: number) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
 
-const CartDrawer: React.FC = () => {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, clearCart, total, itemCount } = useCart();
-
-  const handleCheckout = () => {
-    if (items.length === 0) return;
-    const lines = items.map(
-      (i) => `• ${i.product.name} x${i.quantity} — $${(i.product.price * i.quantity).toLocaleString("es-AR")}`
-    );
-    const msg = encodeURIComponent(
-      `¡Hola GOS MOTOS! 🏍️\nQuiero consultar por estos productos:\n\n${lines.join("\n")}\n\n*Total: $${total.toLocaleString("es-AR")}*\n\n¡Gracias!`
-    );
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
-  };
-
-  if (!isOpen) return null;
+const CartDrawer = () => {
+  const { items, isOpen, closeCart, removeItem, updateQuantity, total, itemCount } = useCart();
+  const navigate = useNavigate();
 
   return (
-    <div className="fixed inset-0 z-[60]">
-      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={closeCart} />
-      <div className="absolute right-0 top-0 h-full w-full max-w-md bg-card border-l border-border flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-xl font-black uppercase tracking-tight text-foreground">Carrito ({itemCount})</h2>
-          <button onClick={closeCart} className="p-1 text-muted-foreground hover:text-foreground">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {items.length === 0 ? (
-            <p className="text-muted-foreground text-center py-10">Tu carrito está vacío</p>
-          ) : (
-            items.map((item) => {
-              const imgUrl = item.product.image_urls?.[0] || item.product.images?.[0] || "/placeholder.svg";
-              return (
-                <div key={item.product.id} className="flex gap-3 bg-secondary rounded-xl p-3">
-                  <img
-                    src={imgUrl}
-                    alt={item.product.name}
-                    className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-sm text-foreground truncate">{item.product.name}</h4>
-                    <p className="text-primary text-lg font-black">${item.product.price.toLocaleString("es-AR")}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="p-1 rounded bg-muted text-foreground hover:bg-border">
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="text-sm text-foreground w-6 text-center">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="p-1 rounded bg-muted text-foreground hover:bg-border">
-                        <Plus className="w-3 h-3" />
-                      </button>
-                      <button onClick={() => removeItem(item.product.id)} className="ml-auto p-1 text-destructive hover:text-destructive/80">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        {items.length > 0 && (
-          <div className="p-4 border-t border-border space-y-3">
-            <div className="flex justify-between text-xl font-black">
-              <span className="text-foreground">Total</span>
-              <span className="text-primary">${total.toLocaleString("es-AR")}</span>
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/50 z-50" onClick={closeCart} />
+          <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="fixed right-0 top-0 h-full w-full max-w-md bg-card z-50 shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="font-display text-lg font-bold flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5 text-primary" /> Carrito ({itemCount})
+              </h2>
+              <button onClick={closeCart} className="p-1 hover:bg-muted rounded-full transition-colors"><X className="h-5 w-5" /></button>
             </div>
-            <button
-              onClick={handleCheckout}
-              className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-lg font-black flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
-            >
-              <MessageCircle className="w-5 h-5" />
-              Consultar por WhatsApp
-            </button>
-            <button
-              onClick={clearCart}
-              className="w-full py-2 rounded-xl bg-secondary text-muted-foreground text-sm hover:bg-border transition-colors"
-            >
-              Vaciar carrito
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+            {items.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                <ShoppingBag className="h-16 w-16 opacity-30" />
+                <p className="text-sm">Tu carrito está vacío</p>
+                <Button variant="cta" size="sm" onClick={closeCart}>Seguir comprando</Button>
+              </div>
+            ) : (
+              <>
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {items.map(item => (
+                    <div key={item.product.id} className="flex gap-3 bg-muted/50 rounded-lg p-3">
+                      <img src={item.product.images?.[0] || '/placeholder.svg'} alt={item.product.title} className="w-20 h-20 object-cover rounded-md" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{item.product.title}</p>
+                        {item.variant && <p className="text-xs text-muted-foreground">Talle: {item.variant}</p>}
+                        <p className="text-sm font-bold mt-1">{formatPrice(item.product.price)}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="h-7 w-7 rounded-md border flex items-center justify-center hover:bg-muted"><Minus className="h-3 w-3" /></button>
+                          <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
+                          <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="h-7 w-7 rounded-md border flex items-center justify-center hover:bg-muted"><Plus className="h-3 w-3" /></button>
+                          <button onClick={() => removeItem(item.product.id)} className="ml-auto text-muted-foreground hover:text-destructive"><X className="h-4 w-4" /></button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Total</span>
+                    <span className="text-xl font-bold">{formatPrice(total)}</span>
+                  </div>
+                  <Button variant="cta" className="w-full" size="lg" onClick={() => { closeCart(); navigate("/checkout"); }}>Ir al Checkout</Button>
+                  <Button variant="outline" className="w-full" onClick={closeCart}>Seguir comprando</Button>
+                </div>
+              </>
+            )}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 
