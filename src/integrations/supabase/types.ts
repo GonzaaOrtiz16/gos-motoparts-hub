@@ -14,33 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
+      categorias: {
+        Row: {
+          created_at: string | null
+          id: string
+          image: string | null
+          nombre: string
+          slug: string | null
+          tipo: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image?: string | null
+          nombre: string
+          slug?: string | null
+          tipo?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image?: string | null
+          nombre?: string
+          slug?: string | null
+          tipo?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
+          brand: string | null
           category: string | null
           created_at: string
           description: string | null
+          free_shipping: boolean | null
           id: string
           image_urls: string[] | null
+          images: string[] | null
+          is_on_sale: boolean | null
           name: string
+          original_price: number | null
           price: number
+          sizes: string[] | null
+          slug: string | null
+          stock: number | null
+          title: string | null
         }
         Insert: {
+          brand?: string | null
           category?: string | null
           created_at?: string
           description?: string | null
+          free_shipping?: boolean | null
           id?: string
           image_urls?: string[] | null
+          images?: string[] | null
+          is_on_sale?: boolean | null
           name: string
+          original_price?: number | null
           price: number
+          sizes?: string[] | null
+          slug?: string | null
+          stock?: number | null
+          title?: string | null
         }
         Update: {
+          brand?: string | null
           category?: string | null
           created_at?: string
           description?: string | null
+          free_shipping?: boolean | null
           id?: string
           image_urls?: string[] | null
+          images?: string[] | null
+          is_on_sale?: boolean | null
           name?: string
+          original_price?: number | null
           price?: number
+          sizes?: string[] | null
+          slug?: string | null
+          stock?: number | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          home_media_type: string | null
+          home_media_url: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          home_media_type?: string | null
+          home_media_url?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          home_media_type?: string | null
+          home_media_url?: string | null
+          id?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
