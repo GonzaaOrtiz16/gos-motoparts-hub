@@ -36,7 +36,7 @@ const CartDrawer: React.FC = () => {
             <p className="text-muted-foreground text-center py-10">Tu carrito está vacío</p>
           ) : (
             items.map((item) => {
-              const imgUrl = (item.product as any).image_urls?.[0] || (item.product as any).images?.[0] || "/placeholder.svg";
+              const imgUrl = item.product.image_urls?.[0] || item.product.images?.[0] || "/placeholder.svg";
               return (
                 <div key={item.product.id} className="flex gap-3 bg-secondary rounded-xl p-3">
                   <img
