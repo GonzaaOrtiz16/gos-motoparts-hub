@@ -12,16 +12,43 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState<'repuestos' | 'categorias' | 'ajustes'>('repuestos');
   const navigate = useNavigate();
 
+  const { data: isAdmin, isLoading: roleLoading } = useQuery({
+    queryKey: ['user-role', user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      return !!data;
+    },
+    enabled: !!user,
+  });
+
   const tabs = [
     { id: 'repuestos' as const, label: 'Repuestos', icon: Package },
     { id: 'categorias' as const, label: 'Categorías', icon: LayoutGrid },
     { id: 'ajustes' as const, label: 'Ajustes', icon: Settings },
   ];
 
-  if (authLoading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
+  if (authLoading || roleLoading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
 
   if (!user) {
     return <LoginForm />;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4 p-8">
+          <h1 className="text-2xl font-black text-foreground">Acceso denegado</h1>
+          <p className="text-muted-foreground">No tenés permisos de administrador.</p>
+          <button onClick={() => navigate('/')} className="text-primary hover:underline font-bold">Volver al inicio</button>
+        </div>
+      </div>
+    );
   }
 
   return (
