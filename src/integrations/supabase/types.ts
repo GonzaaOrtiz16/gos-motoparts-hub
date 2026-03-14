@@ -41,10 +41,54 @@ export type Database = {
         }
         Relationships: []
       }
+      motorcycles: {
+        Row: {
+          brand: string
+          condition: string
+          created_at: string
+          description: string | null
+          id: string
+          images: string[] | null
+          kilometers: number
+          model: string
+          price: number
+          title: string
+          year: number
+        }
+        Insert: {
+          brand: string
+          condition?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          kilometers?: number
+          model: string
+          price: number
+          title: string
+          year: number
+        }
+        Update: {
+          brand?: string
+          condition?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          kilometers?: number
+          model?: string
+          price?: number
+          title?: string
+          year?: number
+        }
+        Relationships: []
+      }
       products: {
         Row: {
+          barcode: string | null
           brand: string | null
           category: string | null
+          cc: string[] | null
           created_at: string
           description: string | null
           free_shipping: boolean | null
@@ -52,6 +96,7 @@ export type Database = {
           image_urls: string[] | null
           images: string[] | null
           is_on_sale: boolean | null
+          moto_fit: string[] | null
           name: string
           original_price: number | null
           price: number
@@ -61,8 +106,10 @@ export type Database = {
           title: string | null
         }
         Insert: {
+          barcode?: string | null
           brand?: string | null
           category?: string | null
+          cc?: string[] | null
           created_at?: string
           description?: string | null
           free_shipping?: boolean | null
@@ -70,6 +117,7 @@ export type Database = {
           image_urls?: string[] | null
           images?: string[] | null
           is_on_sale?: boolean | null
+          moto_fit?: string[] | null
           name: string
           original_price?: number | null
           price: number
@@ -79,8 +127,10 @@ export type Database = {
           title?: string | null
         }
         Update: {
+          barcode?: string | null
           brand?: string | null
           category?: string | null
+          cc?: string[] | null
           created_at?: string
           description?: string | null
           free_shipping?: boolean | null
@@ -88,6 +138,7 @@ export type Database = {
           image_urls?: string[] | null
           images?: string[] | null
           is_on_sale?: boolean | null
+          moto_fit?: string[] | null
           name?: string
           original_price?: number | null
           price?: number
@@ -95,6 +146,30 @@ export type Database = {
           slug?: string | null
           stock?: number | null
           title?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          wants_newsletter: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          wants_newsletter?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          wants_newsletter?: boolean | null
         }
         Relationships: []
       }
@@ -118,6 +193,44 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      stock_movements: {
+        Row: {
+          created_at: string
+          id: string
+          movement_type: string
+          product_id: string | null
+          quantity: number
+          reason: string | null
+          seller_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          movement_type: string
+          product_id?: string | null
+          quantity: number
+          reason?: string | null
+          seller_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          movement_type?: string
+          product_id?: string | null
+          quantity?: number
+          reason?: string | null
+          seller_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
