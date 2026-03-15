@@ -41,6 +41,48 @@ export type Database = {
         }
         Relationships: []
       }
+      heatmap_events: {
+        Row: {
+          created_at: string
+          element_tag: string | null
+          element_text: string | null
+          event_type: string
+          id: string
+          page_path: string
+          scroll_depth: number | null
+          viewport_height: number | null
+          viewport_width: number | null
+          x: number | null
+          y: number | null
+        }
+        Insert: {
+          created_at?: string
+          element_tag?: string | null
+          element_text?: string | null
+          event_type: string
+          id?: string
+          page_path: string
+          scroll_depth?: number | null
+          viewport_height?: number | null
+          viewport_width?: number | null
+          x?: number | null
+          y?: number | null
+        }
+        Update: {
+          created_at?: string
+          element_tag?: string | null
+          element_text?: string | null
+          event_type?: string
+          id?: string
+          page_path?: string
+          scroll_depth?: number | null
+          viewport_height?: number | null
+          viewport_width?: number | null
+          x?: number | null
+          y?: number | null
+        }
+        Relationships: []
+      }
       motorcycles: {
         Row: {
           brand: string
