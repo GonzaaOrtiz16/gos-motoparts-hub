@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogOut, Package, Bike, LayoutGrid, Settings, ScanBarcode, ScanLine } from "lucide-react";
+import { LogOut, Package, Bike, LayoutGrid, Settings, ScanBarcode, ScanLine, FileUp } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -8,6 +8,7 @@ import MotosTab from '@/components/admin/MotosTab';
 import CategoriasTab from '@/components/admin/CategoriasTab';
 import AjustesTab from '@/components/admin/AjustesTab';
 import StockControlTab from '@/components/admin/StockControlTab';
+import ImportadorTab from '@/components/admin/ImportadorTab';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState<'repuestos' | 'motos' | 'categorias' | 'stock' | 'ajustes'>('repuestos');
