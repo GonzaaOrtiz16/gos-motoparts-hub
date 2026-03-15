@@ -59,6 +59,8 @@ function AnimatedRoutes() {
             <Header />
             <CartDrawer />
             <WhatsAppFloating />
+            <AiChat />
+            <HeatmapTracker />
             <main className="flex-1">
               <AnimatePresence mode="wait">
                 <Routes location={location} key={location.pathname}>
