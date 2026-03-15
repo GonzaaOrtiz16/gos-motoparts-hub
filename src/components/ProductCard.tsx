@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Truck, Tag } from "lucide-react";
+import { Truck, Tag, Box, Wrench } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Product {
@@ -13,6 +13,8 @@ interface Product {
   free_shipping: boolean;
   is_on_sale: boolean;
   slug: string;
+  stock?: number | null;
+  moto_fit?: string[] | null;
 }
 
 const formatPrice = (n: number) =>
@@ -27,6 +29,8 @@ const ProductCard = ({ product }: { product: Product }) => {
   const discountPercentage = hasDiscount
     ? Math.round(((product.original_price! - product.price) / product.original_price!) * 100)
     : 0;
+  const stock = product.stock ?? 0;
+  const motoFit = product.moto_fit || [];
 
   return (
     <Link to={`/producto/${product.slug}`} className="group block">
@@ -49,6 +53,18 @@ const ProductCard = ({ product }: { product: Product }) => {
           </motion.div>
         )}
 
+        {/* Stock badge */}
+        <div className="absolute top-3 right-3 z-10">
+          <div className={`px-2 py-1 rounded-full text-[9px] font-black uppercase flex items-center gap-1 ${
+            stock <= 0 ? 'bg-destructive/90 text-destructive-foreground' :
+            stock <= 5 ? 'bg-warning/90 text-warning-foreground' :
+            'bg-success/90 text-success-foreground'
+          }`}>
+            <Box size={10} />
+            {stock <= 0 ? 'Agotado' : stock}
+          </div>
+        </div>
+
         <div className="aspect-square overflow-hidden bg-muted relative">
           <img
             src={product.images?.[0] || "/placeholder.svg"}
@@ -69,6 +85,14 @@ const ProductCard = ({ product }: { product: Product }) => {
           <p className="text-sm text-foreground font-black uppercase italic leading-tight line-clamp-2 min-h-[2.5rem]">
             {product.title}
           </p>
+
+          {/* Compatibility */}
+          {motoFit.length > 0 && (
+            <div className="flex items-center gap-1 text-[9px] text-muted-foreground font-bold">
+              <Wrench size={10} className="text-primary flex-shrink-0" />
+              <span className="truncate">{motoFit.slice(0, 2).join(', ')}{motoFit.length > 2 ? ` +${motoFit.length - 2}` : ''}</span>
+            </div>
+          )}
 
           <div className="space-y-0.5">
             {hasDiscount && (
