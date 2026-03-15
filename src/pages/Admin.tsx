@@ -11,7 +11,7 @@ import StockControlTab from '@/components/admin/StockControlTab';
 import ImportadorTab from '@/components/admin/ImportadorTab';
 
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState<'repuestos' | 'motos' | 'categorias' | 'stock' | 'ajustes'>('repuestos');
+  const [activeTab, setActiveTab] = useState<'repuestos' | 'motos' | 'categorias' | 'stock' | 'importador' | 'ajustes'>('repuestos');
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { displayName } = useUserRole();
