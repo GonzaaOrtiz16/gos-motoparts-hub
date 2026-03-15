@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogOut, Package, Bike, LayoutGrid, Settings, ScanBarcode, ScanLine } from "lucide-react";
+import { LogOut, Package, Bike, LayoutGrid, Settings, ScanBarcode, ScanLine, FileUp } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -8,9 +8,10 @@ import MotosTab from '@/components/admin/MotosTab';
 import CategoriasTab from '@/components/admin/CategoriasTab';
 import AjustesTab from '@/components/admin/AjustesTab';
 import StockControlTab from '@/components/admin/StockControlTab';
+import ImportadorTab from '@/components/admin/ImportadorTab';
 
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState<'repuestos' | 'motos' | 'categorias' | 'stock' | 'ajustes'>('repuestos');
+  const [activeTab, setActiveTab] = useState<'repuestos' | 'motos' | 'categorias' | 'stock' | 'importador' | 'ajustes'>('repuestos');
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { displayName } = useUserRole();
@@ -25,6 +26,7 @@ const Admin = () => {
     { id: 'motos' as const, label: 'Motos', icon: Bike },
     { id: 'categorias' as const, label: 'Categorías', icon: LayoutGrid },
     { id: 'stock' as const, label: 'Stock', icon: ScanBarcode },
+    { id: 'importador' as const, label: 'Importador', icon: FileUp },
     { id: 'ajustes' as const, label: 'Ajustes', icon: Settings },
   ];
 
@@ -74,6 +76,7 @@ const Admin = () => {
         {activeTab === 'motos' && <MotosTab />}
         {activeTab === 'categorias' && <CategoriasTab />}
         {activeTab === 'stock' && <StockControlTab />}
+        {activeTab === 'importador' && <ImportadorTab />}
         {activeTab === 'ajustes' && <AjustesTab />}
       </main>
     </div>
