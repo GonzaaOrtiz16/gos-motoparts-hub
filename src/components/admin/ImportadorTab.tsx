@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 
 interface ParsedRow {
   code: string;
