@@ -258,21 +258,26 @@ export default function ImportadorTab() {
     }
   };
 
+  const isValidFile = (file: File) => {
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    return ext === 'csv' || ext === 'xlsx' || ext === 'xls';
+  };
+
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer.files[0];
-    if (file && (file.name.endsWith('.csv') || file.type === 'text/csv')) {
-      parseCSV(file);
+    if (file && isValidFile(file)) {
+      handleFile(file);
     } else {
-      toast({ title: 'Formato inválido', description: 'Solo se aceptan archivos .csv', variant: 'destructive' });
+      toast({ title: 'Formato inválido', description: 'Solo se aceptan archivos .csv, .xlsx o .xls', variant: 'destructive' });
     }
-  }, [parseCSV]);
+  }, [handleFile]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) parseCSV(file);
-  }, [parseCSV]);
+    if (file) handleFile(file);
+  }, [handleFile]);
 
   const resetImporter = () => {
     setParsedRows([]);
