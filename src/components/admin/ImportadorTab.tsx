@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 
 interface ParsedRow {
   code: string;
@@ -56,85 +57,96 @@ export default function ImportadorTab() {
   const [fileName, setFileName] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const parseCSV = useCallback((file: File) => {
+  const processRows = useCallback((rows: string[][]) => {
     if (!dollarRate || parseFloat(dollarRate) <= 0) {
       toast({ title: 'Error', description: 'Ingresá el valor del dólar antes de subir el archivo.', variant: 'destructive' });
       return;
     }
-
     const rate = parseFloat(dollarRate);
+
+    let headerIdx = -1;
+    for (let i = 0; i < Math.min(rows.length, 30); i++) {
+      const row = rows[i].map(c => (c || '').toString().trim().toLowerCase());
+      if (row.some(c => c.includes('cód') || c.includes('cod')) &&
+          row.some(c => c.includes('descripci') || c.includes('descripcion')) &&
+          row.some(c => c.includes('precio'))) {
+        headerIdx = i;
+        break;
+      }
+    }
+
+    if (headerIdx === -1) {
+      toast({ title: 'Error de formato', description: 'No se encontraron los encabezados esperados (Cód., Descripción, Stock, Mon., Precio).', variant: 'destructive' });
+      return;
+    }
+
+    const headers = rows[headerIdx].map(h => (h || '').toString().trim().toLowerCase());
+    const codeIdx = headers.findIndex(h => h.includes('cód') || h.includes('cod'));
+    const descIdx = headers.findIndex(h => h.includes('descripci'));
+    const stockIdx = headers.findIndex(h => h.includes('stock'));
+    const currIdx = headers.findIndex(h => h.includes('mon'));
+    const priceIdx = headers.findIndex(h => h.includes('precio'));
+
+    const parsed: ParsedRow[] = [];
+    for (let i = headerIdx + 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row || row.length < 3) continue;
+      const desc = (row[descIdx] || '').toString().trim();
+      if (!desc) continue;
+      const rawPrice = parseFloat((row[priceIdx] || '0').toString().replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+      if (rawPrice <= 0) continue;
+      const currency = (row[currIdx] || '').toString().trim().toLowerCase();
+      const isDollar = currency.includes('dól') || currency.includes('dol') || currency.includes('usd') || currency.includes('dollar');
+      const costARS = isDollar ? rawPrice * rate : rawPrice;
+      const salePrice = Math.round(costARS * 1.5);
+      parsed.push({
+        code: (row[codeIdx] || '').toString().trim(),
+        description: desc,
+        stock: parseInt((row[stockIdx] || '0').toString()) || 0,
+        currency: isDollar ? 'USD' : 'ARS',
+        rawPrice,
+        costARS: Math.round(costARS),
+        salePrice,
+      });
+    }
+
+    if (parsed.length === 0) {
+      toast({ title: 'Sin datos', description: 'No se encontraron filas válidas con precio > 0.', variant: 'destructive' });
+      return;
+    }
+
+    setParsedRows(parsed);
+    toast({ title: `${parsed.length} productos parseados`, description: 'Iniciando enriquecimiento con IA...' });
+    enrichWithAI(parsed);
+  }, [dollarRate]);
+
+  const handleFile = useCallback((file: File) => {
+    const ext = file.name.split('.').pop()?.toLowerCase();
     setFileName(file.name);
 
-    Papa.parse(file, {
-      encoding: 'latin1',
-      complete: (results) => {
-        const rows = results.data as string[][];
-        
-        // Find header row containing expected columns
-        let headerIdx = -1;
-        for (let i = 0; i < Math.min(rows.length, 30); i++) {
-          const row = rows[i].map(c => (c || '').toString().trim().toLowerCase());
-          if (row.some(c => c.includes('cód') || c.includes('cod')) &&
-              row.some(c => c.includes('descripci') || c.includes('descripcion')) &&
-              row.some(c => c.includes('precio'))) {
-            headerIdx = i;
-            break;
-          }
+    if (ext === 'csv') {
+      Papa.parse(file, {
+        encoding: 'latin1',
+        complete: (results) => processRows(results.data as string[][]),
+        error: () => toast({ title: 'Error', description: 'No se pudo leer el archivo CSV.', variant: 'destructive' }),
+      });
+    } else if (ext === 'xlsx' || ext === 'xls') {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const wb = XLSX.read(e.target?.result, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json<string[]>(ws, { header: 1, defval: '' });
+          processRows(rows as string[][]);
+        } catch {
+          toast({ title: 'Error', description: 'No se pudo leer el archivo Excel.', variant: 'destructive' });
         }
-
-        if (headerIdx === -1) {
-          toast({ title: 'Error de formato', description: 'No se encontraron los encabezados esperados (Cód., Descripción, Stock, Mon., Precio).', variant: 'destructive' });
-          return;
-        }
-
-        const headers = rows[headerIdx].map(h => (h || '').toString().trim().toLowerCase());
-        const codeIdx = headers.findIndex(h => h.includes('cód') || h.includes('cod'));
-        const descIdx = headers.findIndex(h => h.includes('descripci'));
-        const stockIdx = headers.findIndex(h => h.includes('stock'));
-        const currIdx = headers.findIndex(h => h.includes('mon'));
-        const priceIdx = headers.findIndex(h => h.includes('precio'));
-
-        const parsed: ParsedRow[] = [];
-        for (let i = headerIdx + 1; i < rows.length; i++) {
-          const row = rows[i];
-          if (!row || row.length < 3) continue;
-
-          const desc = (row[descIdx] || '').toString().trim();
-          if (!desc) continue;
-
-          const rawPrice = parseFloat((row[priceIdx] || '0').toString().replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
-          if (rawPrice <= 0) continue;
-
-          const currency = (row[currIdx] || '').toString().trim().toLowerCase();
-          const isDollar = currency.includes('dól') || currency.includes('dol') || currency.includes('usd') || currency.includes('dollar');
-          const costARS = isDollar ? rawPrice * rate : rawPrice;
-          const salePrice = Math.round(costARS * 1.5);
-
-          parsed.push({
-            code: (row[codeIdx] || '').toString().trim(),
-            description: desc,
-            stock: parseInt((row[stockIdx] || '0').toString()) || 0,
-            currency: isDollar ? 'USD' : 'ARS',
-            rawPrice,
-            costARS: Math.round(costARS),
-            salePrice,
-          });
-        }
-
-        if (parsed.length === 0) {
-          toast({ title: 'Sin datos', description: 'No se encontraron filas válidas con precio > 0.', variant: 'destructive' });
-          return;
-        }
-
-        setParsedRows(parsed);
-        toast({ title: `${parsed.length} productos parseados`, description: 'Iniciando enriquecimiento con IA...' });
-        enrichWithAI(parsed);
-      },
-      error: () => {
-        toast({ title: 'Error', description: 'No se pudo leer el archivo CSV.', variant: 'destructive' });
-      },
-    });
-  }, [dollarRate]);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      toast({ title: 'Formato inválido', description: 'Solo se aceptan archivos .csv, .xlsx o .xls', variant: 'destructive' });
+    }
+  }, [processRows]);
 
   const enrichWithAI = async (rows: ParsedRow[]) => {
     setStep('enriching');
@@ -246,21 +258,26 @@ export default function ImportadorTab() {
     }
   };
 
+  const isValidFile = (file: File) => {
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    return ext === 'csv' || ext === 'xlsx' || ext === 'xls';
+  };
+
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer.files[0];
-    if (file && (file.name.endsWith('.csv') || file.type === 'text/csv')) {
-      parseCSV(file);
+    if (file && isValidFile(file)) {
+      handleFile(file);
     } else {
-      toast({ title: 'Formato inválido', description: 'Solo se aceptan archivos .csv', variant: 'destructive' });
+      toast({ title: 'Formato inválido', description: 'Solo se aceptan archivos .csv, .xlsx o .xls', variant: 'destructive' });
     }
-  }, [parseCSV]);
+  }, [handleFile]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) parseCSV(file);
-  }, [parseCSV]);
+    if (file) handleFile(file);
+  }, [handleFile]);
 
   const resetImporter = () => {
     setParsedRows([]);
@@ -323,10 +340,10 @@ export default function ImportadorTab() {
               <Upload size={32} className={dragOver ? 'text-primary' : 'text-muted-foreground'} />
             </div>
             <div className="text-center">
-              <p className="font-bold text-foreground">Arrastrá tu archivo CSV acá</p>
-              <p className="text-sm text-muted-foreground mt-1">o hacé clic para seleccionar</p>
+              <p className="font-bold text-foreground">Arrastrá tu archivo CSV o Excel acá</p>
+              <p className="text-sm text-muted-foreground mt-1">o hacé clic para seleccionar (.csv, .xlsx, .xls)</p>
             </div>
-            <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleFileSelect} />
+            <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={handleFileSelect} />
           </CardContent>
         </Card>
       )}
