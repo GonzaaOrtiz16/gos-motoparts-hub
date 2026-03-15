@@ -8,11 +8,13 @@ import { CartProvider } from "@/context/CartContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Home from "@/pages/Home";
 import ProductList from "@/pages/ProductList";
 import ProductDetail from "@/pages/ProductDetail";
 import Checkout from "@/pages/Checkout";
 import Admin from "@/pages/Admin";
+import Vendedores from "@/pages/Vendedores";
 import Auth from "@/pages/Auth";
 import NotFound from "./pages/NotFound";
 import { MessageCircle } from "lucide-react";
@@ -42,21 +44,39 @@ const App = () => (
         <CartProvider>
           <ScrollToTop />
           <div className="flex flex-col min-h-screen relative">
-            <Header />
-            <CartDrawer />
-            <WhatsAppFloating />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/productos" element={<ProductList />} />
-                <Route path="/producto/:slug" element={<ProductDetail />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
+            <Routes>
+              {/* Admin & Vendedores: standalone layouts, no Header/Footer */}
+              <Route path="/admin" element={
+                <ProtectedRoute requiredRole="admin">
+                  <Admin />
+                </ProtectedRoute>
+              } />
+              <Route path="/vendedores" element={
+                <ProtectedRoute requiredRole="staff">
+                  <Vendedores />
+                </ProtectedRoute>
+              } />
+
+              {/* Public routes with Header/Footer */}
+              <Route path="*" element={
+                <>
+                  <Header />
+                  <CartDrawer />
+                  <WhatsAppFloating />
+                  <main className="flex-1">
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/productos" element={<ProductList />} />
+                      <Route path="/producto/:slug" element={<ProductDetail />} />
+                      <Route path="/checkout" element={<Checkout />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </main>
+                  <Footer />
+                </>
+              } />
+            </Routes>
           </div>
         </CartProvider>
       </BrowserRouter>
