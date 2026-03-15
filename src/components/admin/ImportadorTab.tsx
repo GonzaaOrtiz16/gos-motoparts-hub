@@ -340,10 +340,10 @@ export default function ImportadorTab() {
               <Upload size={32} className={dragOver ? 'text-primary' : 'text-muted-foreground'} />
             </div>
             <div className="text-center">
-              <p className="font-bold text-foreground">Arrastrá tu archivo CSV acá</p>
-              <p className="text-sm text-muted-foreground mt-1">o hacé clic para seleccionar</p>
+              <p className="font-bold text-foreground">Arrastrá tu archivo CSV o Excel acá</p>
+              <p className="text-sm text-muted-foreground mt-1">o hacé clic para seleccionar (.csv, .xlsx, .xls)</p>
             </div>
-            <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleFileSelect} />
+            <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={handleFileSelect} />
           </CardContent>
         </Card>
       )}
