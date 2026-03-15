@@ -10,6 +10,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import PageTransition from "@/components/PageTransition";
+import AiChat from "@/components/AiChat";
+import HeatmapTracker from "@/components/HeatmapTracker";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Home from "@/pages/Home";
 import ProductList from "@/pages/ProductList";
