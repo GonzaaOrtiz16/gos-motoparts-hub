@@ -21,6 +21,15 @@ const Home = () => {
     }
   });
 
+  const { data: categorias = [] } = useQuery({
+    queryKey: ['categorias-home'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('categorias').select('*').eq('tipo', 'repuestos').order('nombre');
+      if (error) throw error;
+      return data;
+    }
+  });
+
   const { data: siteSettings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
@@ -31,22 +40,18 @@ const Home = () => {
   });
 
   const dynamicCategories = useMemo(() => {
-    const catMap = new Map<string, { count: number; image: string | null }>();
+    const countMap = new Map<string, number>();
     products.forEach((p: any) => {
       if (!p.category) return;
-      const existing = catMap.get(p.category);
-      const imgs = p.images || p.image_urls || [];
-      if (!existing) {
-        catMap.set(p.category, { count: 1, image: imgs[0] || null });
-      } else {
-        existing.count++;
-        if (!existing.image && imgs[0]) existing.image = imgs[0];
-      }
+      countMap.set(p.category, (countMap.get(p.category) || 0) + 1);
     });
-    return Array.from(catMap.entries())
-      .map(([name, data]) => ({ name, ...data }))
-      .sort((a, b) => b.count - a.count);
-  }, [products]);
+
+    return categorias.map((cat: any) => ({
+      name: cat.nombre,
+      count: countMap.get(cat.nombre) || 0,
+      image: cat.image || null,
+    })).sort((a: any, b: any) => b.count - a.count);
+  }, [products, categorias]);
 
   const featured = products.filter((p: any) => p.is_on_sale === true);
   const freeShipping = products.filter((p: any) => p.free_shipping === true);
