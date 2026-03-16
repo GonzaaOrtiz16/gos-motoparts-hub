@@ -1,9 +1,11 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, Plus, Minus, Search, ShoppingCart, Trash2, CheckCircle, RotateCcw, Lock, ScanLine, LogOut, Shield } from "lucide-react";
+import { Camera, X, Plus, Minus, Search, ShoppingCart, Trash2, CheckCircle, RotateCcw, Lock, ScanLine, LogOut, Shield, QrCode } from "lucide-react";
+import { Html5Qrcode } from "html5-qrcode";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import ProductQRModal from "@/components/ProductQRModal";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +30,7 @@ const Vendedores = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { isAdmin, isStaff, displayName, loading: roleLoading } = useUserRole();
+  const [scanning, setScanning] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [manualSearch, setManualSearch] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -36,6 +39,8 @@ const Vendedores = () => {
   const [voidTarget, setVoidTarget] = useState<any>(null);
   const [pin, setPin] = useState('');
   const [voiding, setVoiding] = useState(false);
+  const [qrProduct, setQrProduct] = useState<any>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
 
   const { data: products = [] } = useQuery({
     queryKey: ['pos-products'],
@@ -75,6 +80,49 @@ const Vendedores = () => {
   const isVoided = useCallback((saleKey: string) => {
     return todayMovements.some(m => m.movement_type === 'anulacion' && m.reason?.includes(saleKey));
   }, [todayMovements]);
+
+  // Scanner
+  const startScanner = useCallback(() => {
+    setScanning(true);
+    setTimeout(async () => {
+      try {
+        const scanner = new Html5Qrcode("pos-scanner-container");
+        scannerRef.current = scanner;
+        await scanner.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 150 } },
+          (decodedText) => {
+            addProductByCode(decodedText);
+            stopScanner();
+          },
+          () => {}
+        );
+      } catch (err) {
+        console.error("Error cámara:", err);
+        toast.error("No se pudo acceder a la cámara");
+        setScanning(false);
+      }
+    }, 150);
+  }, [products]);
+
+  const stopScanner = useCallback(async () => {
+    if (scannerRef.current) {
+      try { await scannerRef.current.stop(); scannerRef.current.clear(); } catch {}
+      scannerRef.current = null;
+    }
+    setScanning(false);
+  }, []);
+
+  useEffect(() => () => { stopScanner(); }, [stopScanner]);
+
+  const addProductByCode = (code: string) => {
+    const found = products.find(p => p.barcode === code || p.id === code);
+    if (!found) {
+      toast.error(`Producto no encontrado: ${code}`);
+      return;
+    }
+    addToCart(found);
+  };
 
   const addToCart = (product: any) => {
     setCart(prev => {
@@ -223,6 +271,24 @@ const Vendedores = () => {
       </div>
 
       <div className="max-w-lg mx-auto px-4 py-4 space-y-4">
+        {/* Scanner */}
+        <div className="space-y-3">
+          {!scanning ? (
+            <button onClick={startScanner} className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-lg shadow-primary/20">
+              <Camera size={20} /> Escanear Producto
+            </button>
+          ) : (
+            <div className="space-y-2">
+              <div className="rounded-2xl overflow-hidden border-2 border-primary bg-foreground aspect-video">
+                <div id="pos-scanner-container" className="w-full h-full" />
+              </div>
+              <button onClick={stopScanner} className="w-full bg-destructive text-destructive-foreground py-3 rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-2">
+                <X size={16} /> Cerrar Cámara
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
@@ -236,17 +302,24 @@ const Vendedores = () => {
           {searchResults.length > 0 && (
             <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-2xl shadow-xl z-20 overflow-hidden max-h-64 overflow-y-auto">
               {searchResults.map(p => (
-                <button key={p.id} onClick={() => addToCart(p)} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors text-left border-b border-border last:border-b-0">
-                  <img src={(p.images as string[])?.[0] || '/placeholder.svg'} className="w-10 h-10 rounded-lg object-cover bg-muted" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-black uppercase truncate">{p.title || p.name}</p>
-                    <p className="text-[10px] text-muted-foreground font-bold">Stock: {p.stock ?? 0}</p>
-                    {(p.moto_fit as string[] || []).length > 0 && (
-                      <p className="text-[9px] text-primary font-bold truncate">{(p.moto_fit as string[]).join(', ')}</p>
-                    )}
-                  </div>
-                  <p className="text-sm font-black text-primary">{formatPrice(p.price)}</p>
-                </button>
+                <div key={p.id} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors text-left border-b border-border last:border-b-0">
+                  <button onClick={() => addToCart(p)} className="flex items-center gap-3 flex-1 min-w-0 text-left">
+                    <img src={(p.images as string[])?.[0] || '/placeholder.svg'} className="w-10 h-10 rounded-lg object-cover bg-muted" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-black uppercase truncate">{p.title || p.name}</p>
+                      <p className="text-[10px] text-muted-foreground font-bold">Stock: {p.stock ?? 0}</p>
+                      {(p.moto_fit as string[] || []).length > 0 && (
+                        <p className="text-[9px] text-primary font-bold truncate">{(p.moto_fit as string[]).join(', ')}</p>
+                      )}
+                    </div>
+                    <p className="text-sm font-black text-primary">{formatPrice(p.price)}</p>
+                  </button>
+                  {p.barcode && (
+                    <button onClick={() => setQrProduct(p)} className="text-primary hover:text-primary/80 flex-shrink-0" title="Ver QR">
+                      <QrCode size={18} />
+                    </button>
+                  )}
+                </div>
               ))}
             </div>
           )}
@@ -369,6 +442,8 @@ const Vendedores = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ProductQRModal open={!!qrProduct} onOpenChange={(o) => !o && setQrProduct(null)} product={qrProduct} />
     </div>
   );
 };
