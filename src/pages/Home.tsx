@@ -21,7 +21,7 @@ const Home = () => {
     }
   });
 
-  const { data: categorias = [], isLoading: catsLoading } = useQuery({
+  const { data: categorias = [] } = useQuery({
     queryKey: ['categorias-home'],
     queryFn: async () => {
       const { data, error } = await supabase.from('categorias').select('*').eq('tipo', 'repuestos').order('nombre');
