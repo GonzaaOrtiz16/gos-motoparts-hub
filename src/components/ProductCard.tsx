@@ -33,7 +33,7 @@ const ProductCard = memo(({ product }: { product: Product }) => {
     : 0;
   const stock = product.stock ?? 0;
   const motoFit = product.moto_fit || [];
-  const images = product.images || product.image_urls || [];
+  const images = (product.images?.length ? product.images : product.image_urls) || [];
   const displayTitle = product.title || product.name || '';
 
   return (
