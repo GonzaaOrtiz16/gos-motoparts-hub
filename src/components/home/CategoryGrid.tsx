@@ -18,8 +18,7 @@ interface CategoryData {
 
 export default function CategoryGrid({ categories, isLoading }: { categories: CategoryData[]; isLoading: boolean }) {
   const [emblaRef] = useEmblaCarousel(
-    { loop: true, align: "start", dragFree: true },
-    [Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })]
+    { loop: true, align: "start", dragFree: true }
   );
 
   if (isLoading) return null;
