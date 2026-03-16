@@ -52,7 +52,7 @@ const ProductDetail = () => {
     </div>
   );
 
-  const productImages = product.images || product.image_urls || [];
+  const productImages = (product.images?.length ? product.images : product.image_urls) || [];
   const productTitle = product.title || product.name;
   const hasSizes = product.sizes && product.sizes.length > 0;
   const motoFit = product.moto_fit || [];
