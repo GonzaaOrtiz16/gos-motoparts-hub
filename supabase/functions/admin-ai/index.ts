@@ -175,6 +175,33 @@ const tools = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "query_heatmap_insights",
+      description: "Obtener los últimos insights/consejos generados por IA a partir del mapa de calor de la web. Incluye resumen de comportamiento de usuarios y recomendaciones.",
+      parameters: {
+        type: "object",
+        properties: {
+          limit: { type: "number", description: "Cantidad de insights a traer (default 3)" },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "query_heatmap_raw",
+      description: "Consultar datos crudos del mapa de calor: clics, scroll, páginas más visitadas. Útil para análisis detallado.",
+      parameters: {
+        type: "object",
+        properties: {
+          days: { type: "number", description: "Últimos N días (default 7)" },
+          page_path: { type: "string", description: "Filtrar por página específica" },
+        },
+      },
+    },
+  },
 ];
 
 // Tool execution functions
