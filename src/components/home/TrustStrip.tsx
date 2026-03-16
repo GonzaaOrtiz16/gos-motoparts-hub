@@ -2,12 +2,10 @@ import { motion } from "framer-motion";
 import { Truck, Shield, CreditCard, Package } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
 export default function TrustStrip({ productCount }: { productCount: number }) {
-  const isMobile = useIsMobile();
   const [emblaRef] = useEmblaCarousel(
     { loop: true, align: "start" },
     [Autoplay({ delay: 2500, stopOnInteraction: false })]
@@ -41,23 +39,23 @@ export default function TrustStrip({ productCount }: { productCount: number }) {
   return (
     <section className="bg-foreground/[0.03] border-y border-border/50">
       <div className="container py-6 md:py-10 px-4 md:px-16">
-        {isMobile ? (
-          <div ref={emblaRef} className="overflow-hidden">
-            <div className="flex">
-              {items.map(({ icon, val, label }, i) => (
-                <div key={label} className="flex-[0_0_70%] min-w-0 px-2">
-                  <TrustItem icon={icon} val={val} label={label} i={i} />
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-4 gap-8">
+        {/* Mobile: auto-scrolling carousel */}
+        <div ref={emblaRef} className="overflow-hidden md:hidden">
+          <div className="flex">
             {items.map(({ icon, val, label }, i) => (
-              <TrustItem key={label} icon={icon} val={val} label={label} i={i} />
+              <div key={label} className="flex-[0_0_65%] min-w-0 px-2">
+                <TrustItem icon={icon} val={val} label={label} i={i} />
+              </div>
             ))}
           </div>
-        )}
+        </div>
+
+        {/* Tablet & Desktop: grid */}
+        <div className="hidden md:grid grid-cols-4 gap-6 md:gap-8">
+          {items.map(({ icon, val, label }, i) => (
+            <TrustItem key={label} icon={icon} val={val} label={label} i={i} />
+          ))}
+        </div>
       </div>
     </section>
   );
