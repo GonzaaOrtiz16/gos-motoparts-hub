@@ -30,6 +30,15 @@ const Home = () => {
     }
   });
 
+  const { data: siteSettings } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('site_settings').select('*').limit(1).single();
+      if (error) throw error;
+      return data;
+    }
+  });
+
   const dynamicCategories = useMemo(() => {
     const countMap = new Map<string, number>();
     products.forEach((p: any) => {
