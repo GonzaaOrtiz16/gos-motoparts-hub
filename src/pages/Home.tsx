@@ -1,14 +1,25 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Search, Truck, Shield, CreditCard, ArrowRight, Volume2, VolumeX, Flame, Star, Package } from "lucide-react";
+import { Search, Truck, Shield, CreditCard, ArrowRight, Volume2, VolumeX, Flame, Star, Package, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
+
+const categoryIcons: Record<string, string> = {
+  Cascos: "🪖",
+  Cubiertas: "🛞",
+  Lubricantes: "🛢️",
+  Repuestos: "⚙️",
+  Accesorios: "🎒",
+  Indumentaria: "🧥",
+  Baterías: "🔋",
+  Escapes: "💨",
+};
 
 const Home = () => {
   const [q, setQ] = useState("");
@@ -45,15 +56,6 @@ const Home = () => {
     }
   });
 
-  const { data: categories = [] } = useQuery({
-    queryKey: ['categorias', 'repuestos'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('categorias').select('*').eq('tipo', 'repuestos').order('nombre');
-      if (error) throw error;
-      return data;
-    }
-  });
-
   const { data: siteSettings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
@@ -63,8 +65,40 @@ const Home = () => {
     }
   });
 
+  // Dynamic categories from products
+  const dynamicCategories = useMemo(() => {
+    const catMap = new Map<string, { count: number; image: string | null }>();
+    products.forEach((p: any) => {
+      if (!p.category) return;
+      const existing = catMap.get(p.category);
+      const imgs = p.images || p.image_urls || [];
+      if (!existing) {
+        catMap.set(p.category, { count: 1, image: imgs[0] || null });
+      } else {
+        existing.count++;
+        if (!existing.image && imgs[0]) existing.image = imgs[0];
+      }
+    });
+    return Array.from(catMap.entries())
+      .map(([name, data]) => ({ name, ...data }))
+      .sort((a, b) => b.count - a.count);
+  }, [products]);
+
   const featured = products.filter((p: any) => p.is_on_sale === true);
   const freeShipping = products.filter((p: any) => p.free_shipping === true);
+  const latestProducts = products.slice(0, 8);
+
+  // Group products by category for category sections
+  const productsByCategory = useMemo(() => {
+    const map = new Map<string, any[]>();
+    products.forEach((p: any) => {
+      if (!p.category) return;
+      const arr = map.get(p.category) || [];
+      arr.push(p);
+      map.set(p.category, arr);
+    });
+    return map;
+  }, [products]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +111,6 @@ const Home = () => {
       <section ref={heroRef} className="relative h-[92vh] md:h-screen flex items-end overflow-hidden">
         <motion.div style={{ scale: heroScale }} className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-foreground via-foreground/95 to-primary/20" />
-          {/* Geometric accents */}
           <div className="absolute -right-[15%] top-[10%] w-[50%] h-[80%] bg-primary/8 rounded-[100px] blur-3xl" />
           <div className="absolute left-[5%] bottom-[5%] w-[30%] h-[40%] bg-primary/5 rounded-full blur-2xl" />
         </motion.div>
@@ -142,7 +175,6 @@ const Home = () => {
           </div>
         </motion.div>
 
-        {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={heroLoaded ? { opacity: 0.4 } : {}}
@@ -185,49 +217,50 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ─── CATEGORÍAS ─── */}
+      {/* ─── CATEGORÍAS DINÁMICAS ─── */}
       <section className="container py-20 md:py-28 px-6 md:px-12">
         <SectionTitle eyebrow="Navegá por" title="Categorías" link="/productos" />
 
-        {categories.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-8">
-            {categories.map((cat: any, i: number) => (
+        {dynamicCategories.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {dynamicCategories.map((cat, i) => (
               <motion.div
-                key={cat.id}
+                key={cat.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08, ease: easeOut }}
+                transition={{ duration: 0.5, delay: i * 0.06, ease: easeOut }}
               >
-                <Link to={`/productos?categoria=${cat.nombre}`} className="group block">
-                  <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-muted relative">
+                <Link to={`/productos?categoria=${cat.name}`} className="group block">
+                  <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-muted relative">
                     {cat.image ? (
-                      <img src={cat.image} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" alt={cat.nombre} />
+                      <img src={cat.image} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]" alt={cat.name} />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-accent text-accent-foreground font-display font-bold text-3xl">
-                        {cat.nombre[0]}
+                      <div className="w-full h-full flex items-center justify-center bg-accent">
+                        <span className="text-5xl">{categoryIcons[cat.name] || "📦"}</span>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-5">
-                      <p className="text-primary-foreground text-sm font-bold tracking-wide">{cat.nombre}</p>
+                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+                      <p className="text-primary-foreground text-sm md:text-base font-bold tracking-wide">{cat.name}</p>
+                      <p className="text-primary-foreground/60 text-[10px] font-medium">{cat.count} producto{cat.count !== 1 ? 's' : ''}</p>
                     </div>
                   </div>
                 </Link>
               </motion.div>
             ))}
           </div>
-        ) : (
+        ) : !isLoading ? (
           <div className="py-16 text-center border-2 border-dashed border-border rounded-2xl">
             <p className="text-muted-foreground text-sm">Creá categorías desde el panel Admin</p>
           </div>
-        )}
+        ) : null}
       </section>
 
-      {/* ─── OFERTAS ─── */}
+      {/* ─── NUEVOS PRODUCTOS ─── */}
       <section className="bg-accent/30 py-20 md:py-28">
         <div className="container px-6 md:px-12">
-          <SectionTitle eyebrow="Los mejores precios" title="Ofertas destacadas" icon={Flame} />
+          <SectionTitle eyebrow="Recién llegados" title="Nuevos Productos" icon={Sparkles} link="/productos" />
 
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
@@ -235,35 +268,30 @@ const Home = () => {
                 <div key={n} className="aspect-[3/4] bg-muted animate-pulse rounded-2xl" />
               ))}
             </div>
-          ) : featured.length > 0 ? (
+          ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
-              {featured.slice(0, 4).map((p: any, i: number) => (
+              {latestProducts.map((p: any, i: number) => (
                 <motion.div
                   key={p.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1, ease: easeOut }}
+                  transition={{ duration: 0.5, delay: i * 0.08, ease: easeOut }}
                 >
                   <ProductCard product={p} />
                 </motion.div>
               ))}
             </div>
-          ) : (
-            <div className="py-20 text-center border-2 border-dashed border-border rounded-2xl bg-card">
-              <p className="text-muted-foreground text-sm">Próximamente nuevas ofertas</p>
-            </div>
           )}
         </div>
       </section>
 
-      {/* ─── ENVÍO GRATIS ─── */}
-      <section className="container py-20 md:py-28 px-6 md:px-12">
-        <SectionTitle eyebrow="Envío sin cargo" title="Productos seleccionados" icon={Truck} />
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
-          {!isLoading && freeShipping.length > 0 ? (
-            freeShipping.slice(0, 4).map((p: any, i: number) => (
+      {/* ─── OFERTAS ─── */}
+      {featured.length > 0 && (
+        <section className="container py-20 md:py-28 px-6 md:px-12">
+          <SectionTitle eyebrow="Los mejores precios" title="Ofertas destacadas" icon={Flame} link="/productos" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
+            {featured.slice(0, 4).map((p: any, i: number) => (
               <motion.div
                 key={p.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -273,14 +301,60 @@ const Home = () => {
               >
                 <ProductCard product={p} />
               </motion.div>
-            ))
-          ) : (
-            <p className="col-span-full text-center text-muted-foreground py-12 bg-muted rounded-2xl text-sm">
-              Consultá costos de envío por WhatsApp
-            </p>
-          )}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── POR CATEGORÍA ─── */}
+      {dynamicCategories.slice(0, 3).map((cat, catIdx) => {
+        const catProducts = productsByCategory.get(cat.name) || [];
+        if (catProducts.length === 0) return null;
+        return (
+          <section key={cat.name} className={`${catIdx % 2 === 0 ? 'bg-accent/20' : ''} py-20 md:py-24`}>
+            <div className="container px-6 md:px-12">
+              <SectionTitle
+                eyebrow={`${cat.count} productos`}
+                title={cat.name}
+                link={`/productos?categoria=${cat.name}`}
+              />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
+                {catProducts.slice(0, 4).map((p: any, i: number) => (
+                  <motion.div
+                    key={p.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.1, ease: easeOut }}
+                  >
+                    <ProductCard product={p} />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })}
+
+      {/* ─── ENVÍO GRATIS ─── */}
+      {freeShipping.length > 0 && (
+        <section className="container py-20 md:py-28 px-6 md:px-12">
+          <SectionTitle eyebrow="Envío sin cargo" title="Productos seleccionados" icon={Truck} link="/productos" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
+            {freeShipping.slice(0, 4).map((p: any, i: number) => (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1, ease: easeOut }}
+              >
+                <ProductCard product={p} />
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ─── CTA BANNER ─── */}
       <section className="container px-6 md:px-12 pb-20 md:pb-28">
@@ -342,7 +416,6 @@ const Home = () => {
         </motion.section>
       )}
 
-      {/* Breathable spacing before footer */}
       <div className="h-8" />
     </div>
   );
