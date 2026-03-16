@@ -30,16 +30,16 @@ export default function CategoryGrid({ categories, isLoading }: { categories: Ca
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: i * 0.06, ease: easeOut }}
     >
-      <Link to={`/productos?categoria=${cat.name}`} className="group block relative overflow-hidden">
-        <div className="aspect-[4/3] bg-foreground relative">
+      <Link to={`/productos?categoria=${cat.name}`} className="group block relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-500">
+        <div className="aspect-[4/3] bg-foreground relative rounded-2xl overflow-hidden">
           {cat.image ? (
-            <img src={cat.image} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 opacity-70 group-hover:opacity-90" alt={cat.name} />
+            <img src={cat.image} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 opacity-80 group-hover:opacity-100" alt={cat.name} />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-foreground">
               <span className="text-4xl md:text-5xl opacity-60">{categoryIcons[cat.name] || "📦"}</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/30 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-3 md:p-5">
             <div className="flex items-end justify-between">
               <div>
@@ -49,7 +49,7 @@ export default function CategoryGrid({ categories, isLoading }: { categories: Ca
               <ArrowRight size={14} className="text-primary opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300 hidden md:block" />
             </div>
           </div>
-          <div className="absolute bottom-0 left-0 w-0 group-hover:w-full h-[3px] bg-primary transition-all duration-500" />
+          <div className="absolute bottom-0 left-0 w-0 group-hover:w-full h-[3px] bg-primary transition-all duration-500 rounded-b-2xl" />
         </div>
       </Link>
     </motion.div>
