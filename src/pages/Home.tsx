@@ -110,9 +110,13 @@ const Home = () => {
       {/* ─── CINEMATIC HERO ─── */}
       <section ref={heroRef} className="relative h-[92vh] md:h-screen flex items-end overflow-hidden">
         <motion.div style={{ scale: heroScale }} className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-foreground via-foreground/95 to-primary/20" />
-          <div className="absolute -right-[15%] top-[10%] w-[50%] h-[80%] bg-primary/8 rounded-[100px] blur-3xl" />
-          <div className="absolute left-[5%] bottom-[5%] w-[30%] h-[40%] bg-primary/5 rounded-full blur-2xl" />
+          <img
+            src="/wheelie-hero.webp"
+            alt="Moto de calle haciendo wheelie"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-foreground/30" />
         </motion.div>
 
         <motion.div style={{ opacity: heroOpacity }} className="container relative z-10 px-6 md:px-12 pb-16 md:pb-28">
