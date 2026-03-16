@@ -113,21 +113,21 @@ export default function AiChat() {
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button — bottom right, above WhatsApp */}
       <motion.button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-50 bg-primary text-primary-foreground p-4 rounded-full shadow-2xl shadow-primary/30 border-2 border-background"
+        className="fixed bottom-4 right-4 z-50 bg-primary text-primary-foreground p-3.5 rounded-full shadow-xl shadow-primary/20"
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
       >
         <AnimatePresence mode="wait">
           {open ? (
             <motion.div key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-              <X size={24} />
+              <X size={22} />
             </motion.div>
           ) : (
             <motion.div key="bot" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
-              <Bot size={24} />
+              <Bot size={22} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -141,31 +141,29 @@ export default function AiChat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-3rem)] h-[520px] max-h-[70vh] bg-card/95 backdrop-blur-xl border border-border rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-[4.5rem] right-4 z-50 w-[340px] max-w-[calc(100vw-2rem)] h-[480px] max-h-[65vh] bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           >
-            {/* Header */}
-            <div className="px-5 py-4 border-b border-border flex items-center gap-3">
+            <div className="px-4 py-3 border-b border-border flex items-center gap-3">
               <div className="bg-primary/10 p-2 rounded-xl">
-                <Sparkles size={18} className="text-primary" />
+                <Sparkles size={16} className="text-primary" />
               </div>
               <div>
                 <p className="text-sm font-bold text-foreground">Asistente GO's</p>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Asesor técnico con IA</p>
+                <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Asesor técnico con IA</p>
               </div>
             </div>
 
-            {/* Messages */}
-            <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5">
               {messages.length === 0 && (
-                <div className="text-center py-10 space-y-3">
-                  <Bot size={32} className="mx-auto text-muted-foreground/40" />
+                <div className="text-center py-8 space-y-3">
+                  <Bot size={28} className="mx-auto text-muted-foreground/40" />
                   <p className="text-sm text-muted-foreground">¿En qué puedo ayudarte?</p>
-                  <div className="flex flex-wrap justify-center gap-2">
+                  <div className="flex flex-wrap justify-center gap-1.5">
                     {["Repuestos para Yamaha YBR", "Cascos con envío gratis", "¿Qué aceite me recomendás?"].map((q) => (
                       <button
                         key={q}
                         onClick={() => { setInput(q); }}
-                        className="text-[11px] px-3 py-1.5 bg-accent text-accent-foreground rounded-full hover:bg-accent/80 transition-colors"
+                        className="text-[10px] px-2.5 py-1.5 bg-accent text-accent-foreground rounded-full hover:bg-accent/80 transition-colors"
                       >
                         {q}
                       </button>
@@ -177,7 +175,7 @@ export default function AiChat() {
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                    className={`max-w-[85%] px-3.5 py-2 rounded-2xl text-sm leading-relaxed ${
                       m.role === "user"
                         ? "bg-primary text-primary-foreground rounded-br-md"
                         : "bg-muted text-foreground rounded-bl-md"
@@ -210,22 +208,21 @@ export default function AiChat() {
               )}
             </div>
 
-            {/* Input */}
             <form
               onSubmit={(e) => { e.preventDefault(); send(); }}
-              className="px-4 py-3 border-t border-border flex gap-2"
+              className="px-3 py-2.5 border-t border-border flex gap-2"
             >
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Preguntá sobre repuestos..."
-                className="flex-1 bg-muted rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary/30 transition-shadow"
+                className="flex-1 bg-muted rounded-xl px-3.5 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary/30 transition-shadow"
                 disabled={loading}
               />
               <button
                 type="submit"
                 disabled={loading || !input.trim()}
-                className="bg-primary text-primary-foreground p-2.5 rounded-xl disabled:opacity-40 hover:bg-primary/90 transition-colors"
+                className="bg-primary text-primary-foreground p-2 rounded-xl disabled:opacity-40 hover:bg-primary/90 transition-colors shrink-0"
               >
                 <Send size={16} />
               </button>
