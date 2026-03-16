@@ -83,6 +83,39 @@ export type Database = {
         }
         Relationships: []
       }
+      heatmap_insights: {
+        Row: {
+          created_at: string
+          id: string
+          period_end: string
+          period_start: string
+          raw_stats: Json | null
+          recommendations: Json | null
+          summary: string
+          total_events: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          period_end: string
+          period_start: string
+          raw_stats?: Json | null
+          recommendations?: Json | null
+          summary: string
+          total_events?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          raw_stats?: Json | null
+          recommendations?: Json | null
+          summary?: string
+          total_events?: number | null
+        }
+        Relationships: []
+      }
       motorcycles: {
         Row: {
           brand: string

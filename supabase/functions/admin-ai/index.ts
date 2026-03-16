@@ -175,6 +175,33 @@ const tools = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "query_heatmap_insights",
+      description: "Obtener los últimos insights/consejos generados por IA a partir del mapa de calor de la web. Incluye resumen de comportamiento de usuarios y recomendaciones.",
+      parameters: {
+        type: "object",
+        properties: {
+          limit: { type: "number", description: "Cantidad de insights a traer (default 3)" },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "query_heatmap_raw",
+      description: "Consultar datos crudos del mapa de calor: clics, scroll, páginas más visitadas. Útil para análisis detallado.",
+      parameters: {
+        type: "object",
+        properties: {
+          days: { type: "number", description: "Últimos N días (default 7)" },
+          page_path: { type: "string", description: "Filtrar por página específica" },
+        },
+      },
+    },
+  },
 ];
 
 // Tool execution functions
@@ -308,6 +335,46 @@ async function executeToolCall(supabase: any, name: string, args: any): Promise<
         const { error } = await supabase.from("products").delete().eq("id", args.product_id);
         if (error) return JSON.stringify({ error: error.message });
         return JSON.stringify({ success: true, deleted_id: args.product_id });
+      }
+
+      case "query_heatmap_insights": {
+        const { data, error } = await supabase
+          .from("heatmap_insights")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(args.limit || 3);
+        if (error) return JSON.stringify({ error: error.message });
+        return JSON.stringify(data);
+      }
+
+      case "query_heatmap_raw": {
+        const days = args.days || 7;
+        const since = new Date(Date.now() - days * 86400000).toISOString();
+        let query = supabase.from("heatmap_events").select("event_type, page_path, element_tag, element_text, scroll_depth, x, y").gte("created_at", since);
+        if (args.page_path) query = query.eq("page_path", args.page_path);
+        const { data, error } = await query.limit(200);
+        if (error) return JSON.stringify({ error: error.message });
+
+        // Aggregate
+        const pages: Record<string, number> = {};
+        const clicks: Record<string, number> = {};
+        let totalClicks = 0, totalScrolls = 0;
+        const scrollDepths: number[] = [];
+        for (const e of (data || [])) {
+          pages[e.page_path] = (pages[e.page_path] || 0) + 1;
+          if (e.event_type === "click") {
+            totalClicks++;
+            const key = `${e.element_tag}:${(e.element_text || "").slice(0, 40)}`;
+            clicks[key] = (clicks[key] || 0) + 1;
+          }
+          if (e.event_type === "scroll" && e.scroll_depth != null) {
+            totalScrolls++;
+            scrollDepths.push(e.scroll_depth);
+          }
+        }
+        const topClicks = Object.entries(clicks).sort((a, b) => b[1] - a[1]).slice(0, 10);
+        const avgScroll = scrollDepths.length ? Math.round(scrollDepths.reduce((a, b) => a + b, 0) / scrollDepths.length) : 0;
+        return JSON.stringify({ total_events: data?.length, totalClicks, totalScrolls, avgScrollDepth: avgScroll, topPages: pages, topClickedElements: topClicks });
       }
 
       default:

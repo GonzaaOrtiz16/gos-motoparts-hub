@@ -10,6 +10,7 @@ import AjustesTab from '@/components/admin/AjustesTab';
 import StockControlTab from '@/components/admin/StockControlTab';
 import ImportadorTab from '@/components/admin/ImportadorTab';
 import AdminAiDrawer from '@/components/admin/AdminAiDrawer';
+import HeatmapInsightsCard from '@/components/admin/HeatmapInsightsCard';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState<'repuestos' | 'motos' | 'categorias' | 'stock' | 'importador' | 'ajustes'>('repuestos');
@@ -72,7 +73,8 @@ const Admin = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-4 md:p-8">
+      <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
+        <HeatmapInsightsCard />
         {activeTab === 'repuestos' && <RepuestosTab />}
         {activeTab === 'motos' && <MotosTab />}
         {activeTab === 'categorias' && <CategoriasTab />}
