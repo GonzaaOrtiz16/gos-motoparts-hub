@@ -80,6 +80,7 @@ const Admin = () => {
         {activeTab === 'importador' && <ImportadorTab />}
         {activeTab === 'ajustes' && <AjustesTab />}
       </main>
+      <AdminAiDrawer />
     </div>
   );
 };
