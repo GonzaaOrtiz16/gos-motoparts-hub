@@ -19,11 +19,6 @@ export default function HeroSection() {
     return () => clearTimeout(t);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (q.trim()) navigate(`/productos?q=${encodeURIComponent(q)}`);
-  };
-
   return (
     <section ref={heroRef} className="relative h-[85vh] md:h-screen flex items-end pb-16 md:items-center md:pb-0 overflow-hidden bg-foreground">
       {/* Background image with parallax */}
