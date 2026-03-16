@@ -6,9 +6,7 @@ import SmartSearch from "@/components/SmartSearch";
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
 export default function HeroSection() {
-  const [q, setQ] = useState("");
   const [heroLoaded, setHeroLoaded] = useState(false);
-  const navigate = useNavigate();
 
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
