@@ -77,25 +77,15 @@ export default function HeroSection() {
             <span className="text-primary font-medium"> Envíos a todo el país.</span>
           </motion.p>
 
-          {/* Search bar */}
-          <motion.form
+          {/* Smart Search */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={heroLoaded ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 1.1 }}
-            onSubmit={handleSearch}
-            className="flex max-w-lg"
+            className="max-w-lg"
           >
-            <input
-              value={q}
-              onChange={e => setQ(e.target.value)}
-              placeholder="¿Qué estás buscando?"
-              className="flex-1 min-w-0 px-4 md:px-6 py-3 md:py-4 bg-card/10 backdrop-blur-md border border-border/20 text-primary-foreground placeholder:text-muted-foreground outline-none text-sm rounded-l-lg focus:border-primary/50 transition-colors"
-            />
-            <Button type="submit" className="bg-primary hover:bg-primary-glow text-primary-foreground rounded-l-none rounded-r-lg px-4 md:px-8 h-auto font-condensed uppercase tracking-wider text-xs font-bold transition-all duration-300 shrink-0">
-              <Search className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Buscar</span>
-            </Button>
-          </motion.form>
+            <SmartSearch variant="hero" />
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
