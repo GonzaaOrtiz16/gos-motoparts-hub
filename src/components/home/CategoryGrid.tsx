@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -19,8 +18,7 @@ interface CategoryData {
 
 export default function CategoryGrid({ categories, isLoading }: { categories: CategoryData[]; isLoading: boolean }) {
   const [emblaRef] = useEmblaCarousel(
-    { loop: true, align: "start", dragFree: true },
-    [Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })]
+    { loop: true, align: "start", dragFree: true }
   );
 
   if (isLoading) return null;
