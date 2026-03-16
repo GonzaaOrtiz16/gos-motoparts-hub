@@ -37,7 +37,7 @@ const ProductCard = ({ product }: { product: Product }) => {
   const displayTitle = product.title || product.name || '';
 
   return (
-    <Link to={`/producto/${product.slug}`} className="group block">
+    <Link to={`/producto/${product.slug || product.id}`} className="group block">
       <div className="relative">
         {/* Image container — Aura-style 3:4 aspect ratio */}
         <div className="aspect-[3/4] overflow-hidden rounded-2xl bg-muted relative">
