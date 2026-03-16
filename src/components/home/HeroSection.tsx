@@ -1,8 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Search, ArrowRight, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import SmartSearch from "@/components/SmartSearch";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
