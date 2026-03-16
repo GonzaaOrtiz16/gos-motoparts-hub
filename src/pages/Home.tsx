@@ -70,7 +70,6 @@ const Home = () => {
       <TrustStrip productCount={products.length} />
       <CategoryGrid categories={dynamicCategories} isLoading={isLoading} />
 
-      {/* Latest products */}
       <ProductSection
         eyebrow="Recién llegados"
         title="Nuevos Productos"
@@ -79,7 +78,6 @@ const Home = () => {
         products={latestProducts}
       />
 
-      {/* Offers */}
       {featured.length > 0 && (
         <ProductSection
           eyebrow="Los mejores precios"
@@ -90,7 +88,6 @@ const Home = () => {
         />
       )}
 
-      {/* Top 2 categories */}
       {dynamicCategories.slice(0, 2).map((cat) => {
         const catProducts = productsByCategory.get(cat.name) || [];
         if (catProducts.length === 0) return null;
@@ -105,7 +102,6 @@ const Home = () => {
         );
       })}
 
-      {/* Free shipping */}
       {freeShipping.length > 0 && (
         <ProductSection
           eyebrow="Envío sin cargo"
@@ -118,15 +114,12 @@ const Home = () => {
 
       <CtaBanner />
 
-      {/* Media banner */}
       {siteSettings?.home_media_url && (
         <MediaBanner
           mediaUrl={siteSettings.home_media_url}
           mediaType={siteSettings.home_media_type}
         />
       )}
-
-      <div className="h-8" />
     </div>
   );
 };

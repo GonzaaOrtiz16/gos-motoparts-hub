@@ -30,12 +30,9 @@ const WhatsAppFloating = () => (
     href="https://wa.me/5491165483728"
     target="_blank"
     rel="noopener noreferrer"
-    className="fixed bottom-6 left-6 z-50 bg-success text-success-foreground p-4 rounded-full shadow-2xl hover:scale-110 transition-all duration-300 active:scale-95 flex items-center justify-center group border-2 border-background"
+    className="fixed bottom-20 left-4 z-40 bg-success text-success-foreground p-3 rounded-full shadow-xl hover:scale-110 transition-all duration-300 active:scale-95"
   >
-    <MessageCircle size={28} />
-    <span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:ml-2 transition-all duration-500 font-bold uppercase text-[10px] whitespace-nowrap tracking-wider">
-      Consultar
-    </span>
+    <MessageCircle size={22} />
   </a>
 );
 
@@ -45,7 +42,6 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        {/* Admin & Vendedores: standalone layouts */}
         <Route path="/admin" element={
           <ProtectedRoute requiredRole="admin"><Admin /></ProtectedRoute>
         } />
@@ -53,7 +49,6 @@ function AnimatedRoutes() {
           <ProtectedRoute requiredRole="staff"><Vendedores /></ProtectedRoute>
         } />
 
-        {/* Public routes with Header/Footer */}
         <Route path="*" element={
           <>
             <Header />

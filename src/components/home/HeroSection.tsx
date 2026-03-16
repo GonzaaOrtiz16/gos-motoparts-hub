@@ -28,44 +28,40 @@ export default function HeroSection() {
   };
 
   return (
-    <section ref={heroRef} className="relative h-screen flex items-center overflow-hidden bg-foreground">
+    <section ref={heroRef} className="relative h-[85vh] md:h-screen flex items-end pb-16 md:items-center md:pb-0 overflow-hidden bg-foreground">
       {/* Background image with parallax */}
       <motion.div style={{ scale: heroScale, y: heroY }} className="absolute inset-0">
         <img
           src="/wheelie-hero.webp"
           alt="Moto de calle haciendo wheelie"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        {/* Aggressive dark overlays */}
         <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/80 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/40 to-foreground/60" />
-        {/* Red accent glow */}
         <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-primary/10 blur-[120px]" />
       </motion.div>
 
       {/* Content */}
-      <motion.div style={{ opacity: heroOpacity }} className="container relative z-10 px-6 md:px-16">
+      <motion.div style={{ opacity: heroOpacity }} className="container relative z-10 px-5 md:px-16">
         <div className="max-w-3xl">
-          {/* Eyebrow with racing line */}
           <motion.div
             initial={{ opacity: 0, width: 0 }}
             animate={heroLoaded ? { opacity: 1, width: "auto" } : {}}
             transition={{ duration: 0.8, delay: 0.3, ease: easeOut }}
-            className="flex items-center gap-4 mb-8"
+            className="flex items-center gap-3 mb-5 md:mb-8"
           >
-            <div className="h-[2px] w-12 bg-primary" />
-            <p className="text-primary font-condensed text-xs tracking-[0.5em] font-bold uppercase">
+            <div className="h-[2px] w-8 md:w-12 bg-primary" />
+            <p className="text-primary font-condensed text-[10px] md:text-xs tracking-[0.4em] md:tracking-[0.5em] font-bold uppercase">
               Repuestos & Accesorios
             </p>
           </motion.div>
 
-          {/* Main headline — condensed, aggressive */}
-          <h2 className="text-primary-foreground leading-[0.85] mb-8 text-shadow-hero">
+          <h2 className="text-primary-foreground leading-[0.85] mb-5 md:mb-8 text-shadow-hero">
             <motion.span
               initial={{ opacity: 0, y: 60 }}
               animate={heroLoaded ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 1, delay: 0.5, ease: easeOut }}
-              className="block text-6xl md:text-8xl lg:text-[7rem] font-condensed font-bold uppercase tracking-tight"
+              className="block text-[3.2rem] md:text-8xl lg:text-[7rem] font-condensed font-bold uppercase tracking-tight"
             >
               Todo para
             </motion.span>
@@ -73,7 +69,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 60 }}
               animate={heroLoaded ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 1, delay: 0.7, ease: easeOut }}
-              className="block text-6xl md:text-8xl lg:text-[7rem] font-condensed font-bold uppercase tracking-tight text-primary text-shadow-glow"
+              className="block text-[3.2rem] md:text-8xl lg:text-[7rem] font-condensed font-bold uppercase tracking-tight text-primary text-shadow-glow"
             >
               tu moto
             </motion.span>
@@ -83,7 +79,7 @@ export default function HeroSection() {
             initial={{ opacity: 0 }}
             animate={heroLoaded ? { opacity: 1 } : {}}
             transition={{ duration: 0.8, delay: 0.9 }}
-            className="text-muted-foreground text-sm md:text-base font-light max-w-md leading-relaxed mb-10"
+            className="text-muted-foreground text-xs md:text-base font-light max-w-sm md:max-w-md leading-relaxed mb-6 md:mb-10"
           >
             Repuestos originales, accesorios premium y todo lo que necesitás.
             <span className="text-primary font-medium"> Envíos a todo el país.</span>
@@ -101,22 +97,21 @@ export default function HeroSection() {
               value={q}
               onChange={e => setQ(e.target.value)}
               placeholder="¿Qué estás buscando?"
-              className="flex-1 px-6 py-4 bg-card/10 backdrop-blur-md border border-border/20 text-primary-foreground placeholder:text-muted-foreground outline-none text-sm rounded-l-lg focus:border-primary/50 transition-colors"
+              className="flex-1 min-w-0 px-4 md:px-6 py-3 md:py-4 bg-card/10 backdrop-blur-md border border-border/20 text-primary-foreground placeholder:text-muted-foreground outline-none text-sm rounded-l-lg focus:border-primary/50 transition-colors"
             />
-            <Button type="submit" className="bg-primary hover:bg-primary-glow text-primary-foreground rounded-l-none rounded-r-lg px-8 h-auto font-condensed uppercase tracking-wider text-xs font-bold transition-all duration-300">
-              <Search className="h-4 w-4 mr-2" />
-              Buscar
+            <Button type="submit" className="bg-primary hover:bg-primary-glow text-primary-foreground rounded-l-none rounded-r-lg px-4 md:px-8 h-auto font-condensed uppercase tracking-wider text-xs font-bold transition-all duration-300 shrink-0">
+              <Search className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Buscar</span>
             </Button>
           </motion.form>
 
-          {/* Quick CTA */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={heroLoaded ? { opacity: 1 } : {}}
             transition={{ delay: 1.4, duration: 0.6 }}
-            className="mt-8 flex items-center gap-6"
+            className="mt-5 md:mt-8 flex items-center gap-6"
           >
-            <a href="/productos" className="text-xs text-primary font-bold uppercase tracking-wider flex items-center gap-2 hover:gap-3 transition-all group">
+            <a href="/productos" className="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider flex items-center gap-2 hover:gap-3 transition-all group">
               Ver catálogo completo
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </a>
@@ -129,12 +124,11 @@ export default function HeroSection() {
         initial={{ opacity: 0 }}
         animate={heroLoaded ? { opacity: 0.5 } : {}}
         transition={{ delay: 2, duration: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1"
       >
         <ChevronDown className="h-5 w-5 text-primary-foreground animate-bounce" />
       </motion.div>
 
-      {/* Racing stripe at bottom */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary z-20" />
     </section>
   );
