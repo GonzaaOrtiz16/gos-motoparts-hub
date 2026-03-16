@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Truck, Tag, Box, Wrench } from "lucide-react";
-import { motion } from "framer-motion";
 
 interface Product {
   id: string;
@@ -38,17 +37,16 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <Link to={`/producto/${product.slug || product.id}`} className="group block">
-      <div className="relative">
-        {/* Image container — Aura-style 3:4 aspect ratio */}
-        <div className="aspect-[3/4] overflow-hidden rounded-2xl bg-muted relative">
-          {/* Primary image */}
+      <div className="relative bg-card border border-border/50 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1.5 hover:border-primary/20">
+        {/* Image container */}
+        <div className="aspect-[3/4] overflow-hidden bg-muted relative">
           <img
             src={images[0] || "/placeholder.svg"}
             alt={displayTitle}
-            className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.04]"
+            className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110"
             loading="lazy"
           />
-          {/* Second image crossfade on hover */}
+          {/* Second image crossfade */}
           {images[1] && (
             <img
               src={images[1]}
@@ -58,20 +56,20 @@ const ProductCard = ({ product }: { product: Product }) => {
             />
           )}
 
-          {/* Gradient overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          {/* Dark gradient overlay on hover */}
+          <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-          {/* Discount badge */}
+          {/* Discount badge — angular style */}
           {hasDiscount && (
-            <div className="absolute top-3 left-3 z-10 bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+            <div className="absolute top-0 left-0 z-10 bg-primary text-primary-foreground px-4 py-2 text-[10px] font-condensed font-bold uppercase tracking-wider flex items-center gap-1.5">
               <Tag size={10} />
               {discountPercentage}% OFF
             </div>
           )}
 
-          {/* Stock badge */}
-          <div className="absolute top-3 right-3 z-10">
-            <div className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase flex items-center gap-1 backdrop-blur-sm ${
+          {/* Stock */}
+          <div className="absolute top-2 right-2 z-10">
+            <div className={`px-2 py-1 text-[9px] font-bold uppercase flex items-center gap-1 backdrop-blur-md ${
               stock <= 0 ? 'bg-destructive/90 text-destructive-foreground' :
               stock <= 5 ? 'bg-warning/90 text-warning-foreground' :
               'bg-success/90 text-success-foreground'
@@ -81,25 +79,28 @@ const ProductCard = ({ product }: { product: Product }) => {
             </div>
           </div>
 
-          {/* Free shipping floating badge */}
+          {/* Free shipping */}
           {product.free_shipping && (
-            <div className="absolute bottom-3 left-3 z-10 bg-success/90 text-success-foreground backdrop-blur-sm px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase flex items-center gap-1">
+            <div className="absolute bottom-0 left-0 z-10 bg-success text-success-foreground px-3 py-1.5 text-[9px] font-condensed font-bold uppercase tracking-wider flex items-center gap-1.5">
               <Truck size={10} strokeWidth={2.5} />
               Envío Gratis
             </div>
           )}
+
+          {/* Racing accent line on hover */}
+          <div className="absolute bottom-0 left-0 w-0 group-hover:w-full h-[3px] bg-primary transition-all duration-500 z-10" />
         </div>
 
-        {/* Info — clean, breathable */}
-        <div className="mt-4 space-y-1.5">
+        {/* Info */}
+        <div className="p-4 space-y-2">
           <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold text-primary uppercase tracking-[0.15em]">
+            <p className="text-[10px] font-condensed font-bold text-primary uppercase tracking-[0.2em]">
               {product.brand || "Original"}
             </p>
             {motoFit.length > 0 && (
               <div className="flex items-center gap-1 text-[9px] text-muted-foreground font-medium">
                 <Wrench size={9} className="text-primary" />
-                <span className="truncate max-w-[80px]">{motoFit[0]}{motoFit.length > 1 ? ` +${motoFit.length - 1}` : ''}</span>
+                <span className="truncate max-w-[70px]">{motoFit[0]}{motoFit.length > 1 ? ` +${motoFit.length - 1}` : ''}</span>
               </div>
             )}
           </div>
@@ -108,8 +109,8 @@ const ProductCard = ({ product }: { product: Product }) => {
             {displayTitle}
           </p>
 
-          <div className="flex items-center gap-2">
-            <p className="text-base font-display font-bold text-foreground">
+          <div className="flex items-center gap-2 pt-1 border-t border-border/50">
+            <p className="text-lg font-condensed font-bold text-foreground">
               {formatPrice(product.price)}
             </p>
             {hasDiscount && (

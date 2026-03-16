@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=Oswald:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -17,6 +17,7 @@
 
     --primary: 345 80% 30%;
     --primary-foreground: 0 0% 100%;
+    --primary-glow: 345 90% 45%;
 
     --secondary: 0 0% 93%;
     --secondary-foreground: 0 0% 15%;
@@ -50,8 +51,10 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --header-bg: 345 80% 12%;
+    --header-bg: 0 0% 4%;
     --header-foreground: 0 0% 100%;
+
+    --racing-stripe: 345 80% 30%;
   }
 
   .dark {
@@ -63,6 +66,7 @@
     --popover-foreground: 0 0% 95%;
     --primary: 345 80% 40%;
     --primary-foreground: 0 0% 100%;
+    --primary-glow: 345 90% 55%;
     --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 95%;
     --muted: 0 0% 15%;
@@ -74,8 +78,9 @@
     --border: 0 0% 18%;
     --input: 0 0% 18%;
     --ring: 345 80% 40%;
-    --header-bg: 345 80% 8%;
+    --header-bg: 0 0% 3%;
     --header-foreground: 0 0% 100%;
+    --racing-stripe: 345 80% 40%;
   }
 }
 
@@ -93,7 +98,7 @@
 
 @layer components {
   .header-gradient {
-    background: linear-gradient(135deg, hsl(345 80% 12%) 0%, hsl(345 80% 18%) 100%);
+    background: linear-gradient(135deg, hsl(0 0% 4%) 0%, hsl(0 0% 8%) 100%);
   }
   .price-tag {
     @apply text-2xl font-bold text-foreground;
@@ -104,13 +109,50 @@
     color: hsl(var(--success));
   }
   .category-card {
-    @apply relative overflow-hidden rounded-xl cursor-pointer transition-all duration-300;
+    @apply relative overflow-hidden cursor-pointer transition-all duration-300;
   }
   .category-card:hover {
     @apply shadow-lg scale-[1.02];
   }
   .product-card {
-    @apply bg-card rounded-lg border overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+    @apply bg-card overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  /* Racing stripe accent */
+  .racing-stripe {
+    height: 4px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      hsl(var(--primary)) 15%, 
+      hsl(var(--primary)) 85%, 
+      transparent 100%
+    );
+  }
+
+  /* Angular clip for aggressive moto feel */
+  .clip-angular {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3rem), 0 100%);
+  }
+  .clip-angular-reverse {
+    clip-path: polygon(0 3rem, 100% 0, 100% 100%, 0 100%);
+  }
+
+  /* Marquee animation */
+  .marquee-track {
+    display: flex;
+    animation: marquee 30s linear infinite;
+    width: max-content;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  /* Hero text shadow for extra punch */
+  .text-shadow-hero {
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5), 0 0 80px hsl(345 80% 30% / 0.15);
+  }
+  .text-shadow-glow {
+    text-shadow: 0 0 40px hsl(345 80% 30% / 0.4), 0 0 80px hsl(345 80% 30% / 0.2);
   }
 }
 
@@ -118,4 +160,17 @@
   .text-balance {
     text-wrap: balance;
   }
+  .font-condensed {
+    font-family: 'Oswald', 'Space Grotesk', sans-serif;
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px hsl(345 80% 30% / 0.3); }
+  50% { box-shadow: 0 0 40px hsl(345 80% 30% / 0.6); }
 }
