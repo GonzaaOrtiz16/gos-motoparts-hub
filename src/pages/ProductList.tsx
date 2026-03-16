@@ -85,9 +85,9 @@ const ProductList = () => {
       <div>
         <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3 text-primary">Categoría</h4>
         <div className="space-y-0.5">
-          {categorias.map((c: any) => (
-            <FilterButton key={c.id} active={catFilter === c.nombre} onClick={() => setCatFilter(catFilter === c.nombre ? "" : c.nombre)}>
-              {c.nombre}
+          {dynamicCategories.map((c: string) => (
+            <FilterButton key={c} active={catFilter === c} onClick={() => setCatFilter(catFilter === c ? "" : c)}>
+              {c}
             </FilterButton>
           ))}
         </div>
