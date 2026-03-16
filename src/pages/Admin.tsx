@@ -9,6 +9,7 @@ import CategoriasTab from '@/components/admin/CategoriasTab';
 import AjustesTab from '@/components/admin/AjustesTab';
 import StockControlTab from '@/components/admin/StockControlTab';
 import ImportadorTab from '@/components/admin/ImportadorTab';
+import AdminAiDrawer from '@/components/admin/AdminAiDrawer';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState<'repuestos' | 'motos' | 'categorias' | 'stock' | 'importador' | 'ajustes'>('repuestos');
@@ -79,6 +80,7 @@ const Admin = () => {
         {activeTab === 'importador' && <ImportadorTab />}
         {activeTab === 'ajustes' && <AjustesTab />}
       </main>
+      <AdminAiDrawer />
     </div>
   );
 };
