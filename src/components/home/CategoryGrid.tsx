@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -19,7 +18,6 @@ interface CategoryData {
 }
 
 export default function CategoryGrid({ categories, isLoading }: { categories: CategoryData[]; isLoading: boolean }) {
-  const isMobile = useIsMobile();
   const [emblaRef] = useEmblaCarousel(
     { loop: true, align: "start", dragFree: true },
     [Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })]
@@ -40,17 +38,17 @@ export default function CategoryGrid({ categories, isLoading }: { categories: Ca
             <img src={cat.image} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 opacity-70 group-hover:opacity-90" alt={cat.name} />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-foreground">
-              <span className="text-5xl opacity-60">{categoryIcons[cat.name] || "📦"}</span>
+              <span className="text-4xl md:text-5xl opacity-60">{categoryIcons[cat.name] || "📦"}</span>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/50 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-3 md:p-5">
             <div className="flex items-end justify-between">
               <div>
-                <p className="font-condensed text-primary-foreground text-base md:text-xl font-bold uppercase tracking-wide">{cat.name}</p>
-                <p className="text-primary-foreground/40 text-[10px] font-bold uppercase tracking-wider">{cat.count} producto{cat.count !== 1 ? 's' : ''}</p>
+                <p className="font-condensed text-primary-foreground text-sm md:text-xl font-bold uppercase tracking-wide leading-tight">{cat.name}</p>
+                <p className="text-primary-foreground/40 text-[9px] md:text-[10px] font-bold uppercase tracking-wider">{cat.count} producto{cat.count !== 1 ? 's' : ''}</p>
               </div>
-              <ArrowRight size={16} className="text-primary opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
+              <ArrowRight size={14} className="text-primary opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300 hidden md:block" />
             </div>
           </div>
           <div className="absolute bottom-0 left-0 w-0 group-hover:w-full h-[3px] bg-primary transition-all duration-500" />
@@ -64,26 +62,28 @@ export default function CategoryGrid({ categories, isLoading }: { categories: Ca
       <SectionHeader eyebrow="Explorá" title="Categorías" link="/productos" />
 
       {categories.length > 0 ? (
-        isMobile ? (
-          <div ref={emblaRef} className="overflow-hidden -mx-2">
+        <>
+          {/* Mobile & Tablet: Carousel */}
+          <div ref={emblaRef} className="overflow-hidden lg:hidden -mx-1">
             <div className="flex">
               {categories.map((cat, i) => (
-                <div key={cat.name} className="flex-[0_0_45%] min-w-0 px-1.5">
+                <div key={cat.name} className="flex-[0_0_42%] sm:flex-[0_0_30%] min-w-0 px-1.5">
                   <CategoryCard cat={cat} i={i} />
                 </div>
               ))}
             </div>
           </div>
-        ) : (
+
+          {/* Desktop: Grid — all in one row */}
           <div
-            className="grid gap-3 md:gap-4"
-            style={{ gridTemplateColumns: `repeat(${Math.min(categories.length, 6)}, 1fr)` }}
+            className="hidden lg:grid gap-3"
+            style={{ gridTemplateColumns: `repeat(${Math.min(categories.length, 8)}, 1fr)` }}
           >
             {categories.map((cat, i) => (
               <CategoryCard key={cat.name} cat={cat} i={i} />
             ))}
           </div>
-        )
+        </>
       ) : (
         <div className="py-16 text-center border-2 border-dashed border-border rounded-lg">
           <p className="text-muted-foreground text-sm">Creá categorías desde el panel Admin</p>
