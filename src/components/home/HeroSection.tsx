@@ -23,13 +23,16 @@ export default function HeroSection() {
     <section ref={heroRef} className="relative h-[85vh] md:h-screen flex items-end pb-16 md:items-center md:pb-0 overflow-hidden bg-foreground">
       {/* Background image with parallax */}
       <motion.div style={{ scale: heroScale, y: heroY }} className="absolute inset-0">
-        <img
-          src="/wheelie-hero.webp"
-          alt="Moto de calle haciendo wheelie"
+        <video
+          src="/hero-wheelie.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/40 to-foreground/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-foreground/30" />
         <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-primary/10 blur-[120px]" />
       </motion.div>
 
