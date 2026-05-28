@@ -1,73 +1,109 @@
-# Welcome to your Lovable project
+# GO's Motoparts Hub
 
-## Project info
+E-commerce de repuestos y accesorios para motos, con panel de administración completo, asistente de IA y analíticas de comportamiento de usuarios.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## Stack
 
-There are several ways of editing your application.
+| Capa | Tecnología |
+|---|---|
+| Frontend | React 18 + TypeScript + Vite |
+| UI | Tailwind CSS + shadcn/ui + Framer Motion |
+| Backend | Supabase (Postgres + Auth + Edge Functions) |
+| Estado | TanStack React Query |
+| Routing | React Router DOM v6 |
+| Formularios | React Hook Form + Zod |
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Funcionalidades
 
-Changes made via Lovable will be committed automatically to this repo.
+### Tienda
+- Hero con video de fondo y efecto parallax
+- Búsqueda inteligente desde la pantalla principal
+- Catálogo de productos filtrable por categoría
+- Página de detalle con código QR por producto
+- Carrito de compras con drawer lateral
+- Checkout integrado
+- Botón flotante de WhatsApp
 
-**Use your preferred IDE**
+### IA
+- Asistente conversacional en tiempo real (streaming via Supabase Edge Function)
+- Importador de productos con enriquecimiento por IA (nombre, compatibilidad, categoría, keywords) a partir de archivos CSV / Excel
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Panel de administración (`/admin`)
+- Gestión de productos, categorías y motos
+- Control de stock
+- Importador masivo de repuestos con IA
+- Insights de heatmap (clics y profundidad de scroll)
+- Panel de ajustes
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Analytics
+- Heatmap tracker: registra clics y scroll depth en batches hacia Supabase
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Instalación
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+# 1. Clonar el repositorio
+git clone <URL_DEL_REPO>
+cd gos-motoparts-hub
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 2. Instalar dependencias
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 3. Configurar variables de entorno
+cp .env.example .env
+# Completar VITE_SUPABASE_URL y VITE_SUPABASE_PUBLISHABLE_KEY
+
+# 4. Iniciar servidor de desarrollo
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Scripts
 
-**Use GitHub Codespaces**
+```bash
+npm run dev        # Servidor de desarrollo
+npm run build      # Build de producción
+npm run preview    # Vista previa del build
+npm run lint       # Linter
+npm run test       # Tests (Vitest)
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## Variables de entorno
 
-This project is built with:
+| Variable | Descripción |
+|---|---|
+| `VITE_SUPABASE_URL` | URL del proyecto Supabase |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Anon key pública de Supabase |
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## Estructura de rutas
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+```
+/               → Home
+/productos      → Catálogo
+/producto/:slug → Detalle de producto
+/checkout       → Checkout
+/auth           → Login / Registro
+/admin          → Panel de administración (rol: admin)
+/vendedores     → Panel de vendedores (rol: staff)
+```
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## Roles y permisos
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+El acceso a `/admin` y `/vendedores` está protegido por `ProtectedRoute`. El rol se verifica contra Supabase Auth.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+| Ruta | Rol requerido |
+|---|---|
+| `/admin` | `admin` |
+| `/vendedores` | `staff` |
